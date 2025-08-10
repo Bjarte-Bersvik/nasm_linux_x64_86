@@ -1,0 +1,132 @@
+     1                                  ; fcalc.asm
+     2                                  extern printf
+     3                                  
+     4                                  section .data
+     5 00000000 7900000000000000        	number_int	dq		121
+     6 00000008 0900000000000000        	number1		dq		9
+     7 00000010 4900000000000000        	number2		dq		73
+     8                                  	
+     9 00000018 4C69637A627920746F-     	fmt			db		"Liczby to %d i %d", 10, 0
+     9 00000021 20256420692025640A-
+     9 0000002A 00                 
+    10 0000002B 25732025640A00          	fmtfloat	db		"%s %d", 10, 0
+    11 00000032 43616C6B6F77697461-     	fmtint		db		"Calkowita %d do zmiennoprzecinkowej %d pierwiastek to %d", 10, 0
+    11 0000003B 20256420646F207A6D-
+    11 00000044 69656E6E6F70727A65-
+    11 0000004D 63696E6B6F77656A20-
+    11 00000056 256420706965727769-
+    11 0000005F 617374656B20746F20-
+    11 00000068 25640A00           
+    12 0000006C 5A6D69656E6E6F7072-     	f_sum		db		"Zmiennoprzecinkowa suma %d i %d to %d", 10, 0
+    12 00000075 7A6563696E6B6F7761-
+    12 0000007E 2073756D6120256420-
+    12 00000087 6920256420746F2025-
+    12 00000090 640A00             
+    13 00000093 5A6D69656E6E6F7072-     	f_dif		db		"Zmiennoprzecinkowa roznica %d i %d to %d", 10, 0
+    13 0000009C 7A6563696E6B6F7761-
+    13 000000A5 20726F7A6E69636120-
+    13 000000AE 256420692025642074-
+    13 000000B7 6F2025640A00       
+    14 000000BD 5A6D69656E6E6F7072-     	f_mul		db		"Zmiennoprzecinkowy iloczyn %d i %d to %d", 10, 0
+    14 000000C6 7A6563696E6B6F7779-
+    14 000000CF 20696C6F637A796E20-
+    14 000000D8 256420692025642074-
+    14 000000E1 6F2025640A00       
+    15 000000E7 5A6D69656E6E6F7072-     	f_div		db		"Zmiennoprzecinkowy iloraz %d i %d to %d", 10, 0
+    15 000000F0 7A6563696E6B6F7779-
+    15 000000F9 20696C6F72617A2025-
+    15 00000102 64206920256420746F-
+    15 0000010B 2025640A00         
+    16 00000110 506965727769617374-     	f_sqrt		db		"Pierwiastek kwadratowy z %d to %d", 10, 0
+    16 00000119 656B206B7761647261-
+    16 00000122 746F7779207A202564-
+    16 0000012B 20746F2025640A00   
+    17                                  
+    18                                  section .bss
+    19                                  section .text
+    20                                  	global	main
+    21                                  
+    22                                  main:
+    23                                  ;	push		rbp
+    24 00000000 4889E5                  	mov			rbp, rsp
+    25                                  
+    26                                  	; wypisujemy liczby
+    27 00000003 48BF-                   	mov 		rdi, fmt
+    27 00000005 [1800000000000000] 
+    28 0000000D 488B3425[08000000]      	mov			rsi, [number1]
+    29 00000015 488B1425[10000000]      	mov			rdx, [number2]
+    30 0000001D B800000000              	mov 		rax, 0 ; dwie wartosci zmiennoprzecinkowe
+    31 00000022 E8(00000000)            	call		printf
+    32                                  
+    33 00000027 4889EC                  	mov 		rsp, rbp
+    34                                  ;	pop			rbp
+    35 0000002A C3                      	ret
+    36                                  	; suma	
+    37                                  	;movsd		xmm2, [number1] ; 
+    38                                  	;addsd 		xmm2, [number2] ; dodajemy do xmm
+    39                                  
+    40                                  		; wypisujemy wynik
+    41                                  		;movsd 	xmm0, [number1]
+    42                                  		;movsd   xmm1, [number2]
+    43                                  		;mov     rdi, f_sum
+    44                                  		;mov     rax, 3 ; trzy wartosci zmiennoprzecinkowe
+    45                                  		;call    printf
+    46                                  
+    47                                  	;movsd		xmm2, [number1]
+    48                                  	;subsd		xmm2, [number2] ; odejmujemy xmm
+    49                                  		; wynik
+    50                                  		;movsd	xmm0, [number1]
+    51                                  		;movsd	xmm1, [number2]
+    52                                  		;mov 	rdi, f_dif
+    53                                  		;mov 	rax, 3
+    54                                  		;call	printf
+    55                                  
+    56                                  	; mnozenie
+    57                                  ;	movsd		xmm2, [number1]
+    58                                  ;	mulsd		xmm2, [number2]
+    59                                  ;		;	wynik
+    60                                  ;		movsd	xmm0, [number1]
+    61                                  ;		movsd	xmm1, [number2]
+    62                                  ;		mov 	rdi, f_mul
+    63                                  ;		mov 	rax, 3
+    64                                  ;		call	printf
+    65                                  	
+    66                                  	; dzielenie	
+    67                                  ;	movsd		xmm2, [number1]
+    68                                  ;	divsd 		xmm2, [number2]
+    69                                  		; wynik
+    70                                  ;		mov 	rdi, f_div
+    71                                  ;		movsd	xmm0, [number1]
+    72                                  ;		movsd   xmm1, [number2]
+    73                                  ;		mov 	rax, 3
+    74                                  ;		call	printf
+    75                                  
+    76                                  	; pierwiastek kwadratowy
+    77                                  ;	sqrtsd	xmm1, [number1] ; z liczby podwojnej precyzji
+    78                                  
+    79                                  ;	mov 	rdi, f_sqrt
+    80                                  ;	movsd 	xmm0, [number1]
+    81                                  ;	mov 	rax, 2
+    82                                  ;	call 	printf
+    83                                  
+    84                                  
+    85                                  	; pierwiastek kwadratowy z liczby calkowitej
+    86                                  ;	mov 	rax, [number_int]
+    87                                  
+    88                                  	; konwersja
+    89                                  ;	cvtsi2sd	xmm1, rax
+    90                                  ;	sqrtsd 		xmm0, xmm1
+    91                                  ;
+    92                                  	; konwersja z double -> int
+    93                                  ;	cvttsd2si 	rax, xmm0
+    94                                  
+    95                                  ;	mov 		rdi, fmtint
+    96                                  ;	mov 		rsi, [number_int] 
+    97                                  ;	movsd 		xmm0, xmm1
+    98                                  ;	mov 		rdx, rax
+    99                                  ;	mov 		rax, 1
+   100                                  ;	call		printf
+   101                                  ;	
+   102                                  ;	mov 		rsp, rbp
+   103                                  	;pop			rbp
+   104                                  ;	ret

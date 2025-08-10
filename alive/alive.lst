@@ -1,0 +1,32 @@
+     1                                  extern printf
+     2                                  
+     3                                  section .data
+     4 00000000 576974616A2C20C59B-     	msg		db "Witaj, świecie", 0
+     4 00000009 77696563696500     
+     5 00000010 546F206A657374206E-     	fmtstr	db "To jest nasz łańcuch: %s, ", 10, 0 ; printf
+     5 00000019 61737A20C58261C584-
+     5 00000022 637563683A2025732C-
+     5 0000002B 200A00             
+     6                                  	
+     7                                  section .bss
+     8                                  section .text
+     9                                  
+    10                                  global main
+    11                                  
+    12                                  main:
+    13 00000000 55                      	push	rbp
+    14 00000001 4889E5                  	mov		rbp, rsp
+    15                                  
+    16 00000004 48BF-                   	mov		rdi, fmtstr ; pierwszy argument printf czyli string printf("string")
+    16 00000006 [1000000000000000] 
+    17 0000000E 48BE-                   	mov		rsi, msg	; drugi arg printf("string", dane);
+    17 00000010 [0000000000000000] 
+    18 00000018 B800000000              	mov		rax, 0		; nie używam rejestrów xmm
+    19 0000001D E8(00000000)            	call	printf
+    20                                  
+    21 00000022 4889EC                  	mov		rsp, rbp
+    22 00000025 5D                      	pop		rbp
+    23                                  	
+    24 00000026 B83C000000              	mov rax, 60
+    25 0000002B BF00000000              	mov rdi, 0
+    26 00000030 0F05                    	syscall

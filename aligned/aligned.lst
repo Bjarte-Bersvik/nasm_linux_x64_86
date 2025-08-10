@@ -1,0 +1,46 @@
+     1                                  ; aligned
+     2                                  
+     3                                  extern printf
+     4                                  section .data
+     5 00000000 322072617A79207069-     	fmt	db	"2 razy pi równa sie %.14f", 10, 0
+     5 00000009 2072C3B3776E612073-
+     5 00000012 696520252E3134660A-
+     5 0000001B 00                 
+     6 0000001C 112D4454FB210940        	pi	dq	3.14159265358979
+     7                                  
+     8                                  section .bss
+     9                                  section .text
+    10                                  ;----------
+    11                                  func3:
+    12 00000000 55                      	push	rbp
+    13 00000001 F20F100425-             		movsd	xmm0, [pi]
+    13 00000006 [1C000000]         
+    14 0000000A F20F580425-             		addsd	xmm0, [pi]
+    14 0000000F [1C000000]         
+    15 00000013 48BF-                   		mov 	rdi, fmt
+    15 00000015 [0000000000000000] 
+    16 0000001D B801000000              		mov 	rax, 1
+    17 00000022 E8(00000000)            		call 	printf
+    18 00000027 5D                      	pop	rbp
+    19 00000028 C3                      	ret
+    20                                  ;----------
+    21                                  
+    22                                  func2:
+    23 00000029 55                      	push 	rbp
+    24 0000002A E8D1FFFFFF              	call	func3
+    25 0000002F 5D                      	pop		rbp
+    26 00000030 C3                      	ret
+    27                                  ;----------
+    28                                  func1:
+    29 00000031 55                      	push	rbp
+    30 00000032 E8F2FFFFFF              	call	func2
+    31 00000037 5D                      	pop 	rbp
+    32 00000038 C3                      	ret
+    33                                  
+    34                                  global main
+    35                                  main:
+    36 00000039 55                      	push	rbp
+    37 0000003A E8F2FFFFFF              	call	func1
+    38 0000003F 5D                      	pop		rbp
+    39 00000040 C3                      	ret
+    40                                  	

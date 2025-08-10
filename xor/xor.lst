@@ -1,0 +1,112 @@
+     1                                  ; xor.asm
+     2                                  
+     3                                  extern printf
+     4                                  section .data
+     5                                  
+     6 00000000 546F2062652C206F72-     	wrd		db 	"To be, or not to be, that is the question.", 0
+     6 00000009 206E6F7420746F2062-
+     6 00000012 652C20746861742069-
+     6 0000001B 732074686520717565-
+     6 00000024 7374696F6E2E00     
+     7                                  	wrdLn	equ	$ - wrd - 1
+     8                                  
+     9 0000002B 4B6579313233343531-     	ky		db 	"Key123451", 0
+     9 00000034 00                 
+    10                                  	kyLn	equ $ - ky - 1
+    11                                  		
+    12 00000035 5B456E63727970745D-     	fmt_enc	db 	"[Encrypt]: %s", 10, 0
+    12 0000003E 3A2025730A00       
+    13 00000044 5B446563727970745D-     	fmt_dec db	"[Decrypt]: %s", 10, 0
+    13 0000004D 3A2025730A00       
+    14                                  	
+    15                                  section .bss
+    16                                  section .text
+    17                                  
+    18                                  ; ----------------
+    19                                  countKeyIndex:
+    20 00000000 55                      	push rbp
+    21 00000001 4889E5                  	mov	 rbp, rsp
+    22                                  		
+    23 00000004 4889F8                  		mov	rax, rdi 	; r12 = i = index wrd
+    24 00000007 4831D2                  		xor rdx, rdx    ; zerowanie rdx
+    25 0000000A 4889F1                  		mov	rcx, rsi
+    26 0000000D 48F7F1                  		div rcx 		; reszta w rdx - rdx reszta to index po ky
+    27                                  
+    28 00000010 4889D0                  		mov	rax, rdx		
+    29                                  
+    30 00000013 C9                      	leave 
+    31 00000014 C3                      	ret
+    32                                  ; ----------------
+    33                                  
+    34                                  	global main
+    35                                  main:
+    36 00000015 55                      	push	rbp
+    37 00000016 4889E5                  	mov		rbp, rsp
+    38                                  	
+    39 00000019 4831C0                  	xor		rax, rax 	; div
+    40 0000001C 4831C9                  	xor		rcx, rcx 	; div
+    41 0000001F 4831D2                  	xor		rdx, rdx 	; div - index key - mod
+    42 00000022 4D31C0                  	xor		r8, r8 	 	; znaki 
+    43 00000025 4D31C9                  	xor		r9, r9   	; znaki
+    44 00000028 4D31E4                  	xor		r12, r12 	; index wrd inc
+    45                                  	
+    46 0000002B BB2A000000              	mov		rbx, wrdLn ; liczba znakow
+    47                                  	
+    48                                  	loopEncrypt:
+    49 00000030 4C89E7                  		mov	 rdi, r12
+    50 00000033 BE09000000              		mov	 rsi, kyLn
+    51 00000038 E8C3FFFFFF              		call countKeyIndex
+    52                                  				
+    53 0000003D 458A8424[00000000]      		mov	r8b, byte [wrd + r12]
+    54 00000045 448A88[2B000000]        		mov	r9b, byte [ky + rax]
+    55                                  
+    56 0000004C 4530C8                  		xor r8b, r9b
+    57 0000004F 45888424[00000000]      		mov	byte [wrd + r12], r8b
+    58                                  
+    59 00000057 49FFC4                  		inc r12
+    60 0000005A 4939DC                  		cmp	r12, rbx ; index < wrdLn
+    61 0000005D 7CD1                    		jl	loopEncrypt		
+    62                                  
+    63                                  			
+    64 0000005F 48BF-                   	mov	 rdi, fmt_enc
+    64 00000061 [3500000000000000] 
+    65 00000069 48BE-                   	mov	 rsi, wrd
+    65 0000006B [0000000000000000] 
+    66 00000073 B800000000              	mov	 rax, 0
+    67 00000078 E8(00000000)            	call printf
+    68                                  
+    69                                  
+    70                                  ; -- DECRYPT --
+    71 0000007D 4831C0                  	xor		rax, rax ; div
+    72 00000080 4831C9                  	xor		rcx, rcx ; div
+    73 00000083 4831D2                  	xor		rdx, rdx ; div - index key - mod
+    74 00000086 4D31C0                  	xor		r8, r8 	 ; znaki 
+    75 00000089 4D31C9                  	xor		r9, r9   ; znaki
+    76 0000008C 4D31E4                  	xor		r12, r12 ; index wrd inc
+    77                                  	
+    78 0000008F BB2A000000              	mov		rbx, wrdLn ; liczba znakow
+    79                                  	
+    80                                  	loopDecrypt:
+    81 00000094 4C89E7                  		mov	 rdi, r12
+    82 00000097 BE09000000              		mov	 rsi, kyLn
+    83 0000009C E85FFFFFFF              		call countKeyIndex
+    84                                  		
+    85 000000A1 458A8424[00000000]      		mov	r8b, byte [wrd + r12]
+    86 000000A9 448A88[2B000000]        		mov	r9b, byte [ky + rax]
+    87                                  
+    88 000000B0 4530C8                  		xor r8b, r9b
+    89 000000B3 45888424[00000000]      		mov	byte [wrd + r12], r8b
+    90                                  
+    91 000000BB 49FFC4                  		inc r12
+    92 000000BE 4939DC                  		cmp	r12, rbx
+    93 000000C1 7CD1                    		jl	loopDecrypt
+    94                                  
+    95 000000C3 48BF-                   	mov	 rdi, fmt_dec
+    95 000000C5 [4400000000000000] 
+    96 000000CD 48BE-                   	mov	 rsi, wrd
+    96 000000CF [0000000000000000] 
+    97 000000D7 B800000000              	mov	 rax, 0
+    98 000000DC E8(00000000)            	call printf
+    99                                  
+   100 000000E1 C9                      	leave
+   101 000000E2 C3                      	ret

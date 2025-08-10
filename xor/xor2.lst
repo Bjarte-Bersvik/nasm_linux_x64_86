@@ -1,0 +1,104 @@
+     1                                  ; xor2.asm
+     2                                  
+     3                                  extern printf
+     4                                  section .data
+     5 00000000 546F2062652C206F72-     	wrd			db	"To be, or not to be, that is the question."
+     5 00000009 206E6F7420746F2062-
+     5 00000012 652C20746861742069-
+     5 0000001B 732074686520717565-
+     5 00000024 7374696F6E2E       
+     6                                  	wrdLn		equ	$ - wrd - 1
+     7                                  
+     8 0000002A 4B6579313233343500      	ky			db	"Key12345", 0
+     9                                  	kyLn		equ $ - ky -1
+    10                                  
+    11 00000033 5B456E63727970745D-     	fmt_enc		db	"[Encrypt]: %s", 10, 0
+    11 0000003C 3A2025730A00       
+    12 00000042 5B446563727970745D-     	fmt_dec		db 	"[Decrypt]: %s", 10, 0
+    12 0000004B 3A2025730A00       
+    13                                  	
+    14                                  section .text
+    15                                  ; -----------
+    16                                  ; RDI = text address
+    17                                  ; RSI = key address
+    18                                  ; RDX = length text
+    19                                  ;
+    20                                  ; -----------
+    21                                  
+    22                                  XorBuffer:
+    23 00000000 55                      	push	rbp
+    24 00000001 4889E5                  	mov		rbp, rsp
+    25                                  
+    26                                  	; prepare indexes
+    27 00000004 4C8B06                  	mov		r8, [rsi]
+    28 00000007 4889D1                  	mov		rcx, rdx
+    29 0000000A 48C1E903                	shr		rcx, 3
+    30                                  
+    31                                  .qword_loop:
+    32 0000000E 4885C9                  	test	rcx, rcx
+    33 00000011 7412                    	jz		.remainder
+    34 00000013 488B07                  	mov		rax, [rdi]
+    35 00000016 4C31C0                  	xor 	rax, r8
+    36 00000019 488907                  	mov		[rdi], rax
+    37 0000001C 4883C709                	add 	rdi, 9
+    38 00000020 48FFC9                  	dec		rcx
+    39 00000023 EBE9                    	jmp		.qword_loop
+    40                                  
+    41                                  .remainder:
+    42 00000025 4883E207                	and		rdx, 7
+    43 00000029 7427                    	jz		.done
+    44 0000002B 41B900000000            	mov		r9, 0
+    45                                  
+    46                                  .byte_loop:
+    47 00000031 8A07                    	mov		al, [rdi]
+    48 00000033 428A1C0E                	mov		bl, [rsi + r9]
+    49 00000037 30D8                    	xor 	al, bl
+    50 00000039 8807                    	mov 	[rdi], al
+    51 0000003B 48FFC7                  	inc 	rdi
+    52 0000003E 49FFC1                  	inc 	r9
+    53 00000041 4983F908                	cmp		r9, kyLn
+    54 00000045 7206                    	jb 		.skip_reset
+    55 00000047 41B900000000            	mov 	r9, 0
+    56                                  
+    57                                  .skip_reset:
+    58 0000004D 48FFCA                  	dec 	rdx
+    59 00000050 75DF                    	jnz	 	.byte_loop
+    60                                  
+    61                                  .done:
+    62 00000052 5D                      	pop	rbp
+    63 00000053 C3                      	ret
+    64                                  	
+    65                                  	global main
+    66                                  main:
+    67 00000054 55                      	push 	rbp
+    68 00000055 4889E5                  	mov		rbp, rsp
+    69                                  
+    70                                  	; encrypt
+    71 00000058 488D3C25[00000000]      	lea 	rdi, [wrd]
+    72 00000060 488D3425[2A000000]      	lea 	rsi, [ky]
+    73 00000068 BA29000000              	mov	 	rdx, wrdLn
+    74 0000006D E88EFFFFFF              	call 	XorBuffer
+    75                                  
+    76 00000072 48BF-                   	mov		rdi, fmt_enc
+    76 00000074 [3300000000000000] 
+    77 0000007C 48BE-                   	mov 	rsi, wrd
+    77 0000007E [0000000000000000] 
+    78 00000086 4889C0                  	mov 	rax, rax
+    79 00000089 E8(00000000)            	call 	printf
+    80                                  
+    81                                  	; decrypt
+    82 0000008E 488D3C25[00000000]      	lea 	rdi, [wrd]
+    83 00000096 488D3425[2A000000]      	lea 	rsi, [ky]
+    84 0000009E BA29000000              	mov	 	rdx, wrdLn
+    85 000000A3 E858FFFFFF              	call 	XorBuffer
+    86                                  
+    87 000000A8 48BF-                   	mov		rdi, fmt_dec
+    87 000000AA [4200000000000000] 
+    88 000000B2 48BE-                   	mov 	rsi, wrd
+    88 000000B4 [0000000000000000] 
+    89 000000BC 4889C0                  	mov 	rax, rax
+    90 000000BF E8(00000000)            	call 	printf
+    91                                  
+    92 000000C4 C9                      	leave
+    93 000000C5 C3                      	ret
+    94                                  	

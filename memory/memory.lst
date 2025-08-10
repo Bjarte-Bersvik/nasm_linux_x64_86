@@ -1,0 +1,58 @@
+     1                                  section .data
+     2 00000000 7B                      	bNum		db		123
+     3 00000001 3930                    	wNum		dw		12345
+     4 00000003 0000<rep 5h>            	warray		times	5 dw 0
+     5 0000000D 39300000                	dNum		dd		12345
+     6 00000011 3930000000000000        	qNum1		dq		12345
+     7 00000019 616263646566676869-     	text1		db		"abcdefghijklmnopqrst", 0
+     7 00000022 6A6B6C6D6E6F707172-
+     7 0000002B 737400             
+     8 0000002E 50455254FB210940        	qNum2		dq		3.141592654
+     9 00000036 4142434445464700        	text2		db		"ABCDEFG", 0
+    10                                  
+    11                                  section .bss
+    12 00000000 ??                      	bvar		resb	1
+    13 00000001 ????????                	dvar		resd	1
+    14 00000005 <res 14h>               	wvar		resw	10
+    15 00000019 <res 3A980h>            	qvar		resq	30000
+    16                                  
+    17                                  section .text
+    18                                  	global main
+    19                                  
+    20                                  main:
+    21 00000000 55                      	push	rbp
+    22 00000001 4889E5                  	mov		rbp, rsp
+    23                                  
+    24 00000004 4831C0                  	xor		rax, rax
+    25 00000007 4831DB                  	xor		rbx, rbx
+    26 0000000A 4831C9                  	xor		rcx, rcx
+    27 0000000D 4831D2                  	xor		rdx, rdx
+    28 00000010 4831FF                  	xor		rdi, rdi
+    29 00000013 4831F6                  	xor		rsi, rsi
+    30 00000016 4D31C0                  	xor		r8, r8
+    31 00000019 4D31C9                  	xor		r9, r9
+    32 0000001C 4D31D2                  	xor		r10, r10
+    33                                  	
+    34 0000001F 488D0425[00000000]      	lea		rax, [bNum] ; adres
+    35 00000027 48B8-                   	mov		rax, bNum   ; adres
+    35 00000029 [0000000000000000] 
+    36 00000031 4831C0                  	xor		rax, rax
+    37 00000034 8A0425[00000000]        	mov		al, [bNum] ; zawartosc
+    38 0000003B 880425[00000000]        	mov		[bvar], al ; do bvar wczytaj zawartosc spod rax
+    39                                  
+    40 00000042 488D0425[01000000]      	lea		rax, [wNum]  ; adres
+    41 0000004A 488B0425[01000000]      	mov		rax, [wNum]  ; zawartosc
+    42 00000052 488D0425[19000000]      	lea		rax, [text1] ; adres
+    43 0000005A 48B8-                   	mov		rax, text1   ; adres
+    43 0000005C [1900000000000000] 
+    44 00000064 48B8-                   	mov		rax, text1+1 ; wczytaj adres drugiego znaku do rax
+    44 00000066 [1A00000000000000] 
+    45 0000006E 488D0425[1A000000]      	lea		rax, [text1+1] ; wczytaj; adres drugiego znaku do rax
+    46                                  
+    47                                  	
+    48                                  
+    49                                  
+    50                                  
+    51 00000076 4889EC                  	mov		rsp, rbp
+    52 00000079 5D                      	pop		rbp
+    53 0000007A C3                      	ret

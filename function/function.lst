@@ -1,0 +1,40 @@
+     1                                  ; function.asm
+     2                                  
+     3                                  extern printf
+     4                                  section .data
+     5 00000000 0000000000002440        	radius	dq	10.0
+     6 00000008 1F85EB51B81E0940        	pi		dq	3.14
+     7 00000010 506F6C65206B6FC582-     	fmt		db	"Pole koła to %.2f", 10, 0
+     7 00000019 6120746F20252E3266-
+     7 00000022 0A00               
+     8                                  
+     9                                  section .bss
+    10                                  section .text
+    11                                  	global main
+    12                                  
+    13                                  main:
+    14 00000000 55                      	push	rbp
+    15 00000001 4889E5                  	mov		rbp, rsp
+    16 00000004 E816000000              		call	area
+    17                                  
+    18 00000009 48BF-                   		mov		rdi, fmt
+    18 0000000B [1000000000000000] 
+    19 00000013 B801000000              		mov		rax, 1
+    20 00000018 E8(00000000)            		call	printf
+    21                                  
+    22 0000001D C9                      	leave
+    23 0000001E C3                      	ret
+    24                                  
+    25                                  area:
+    26 0000001F 55                      	push	rbp
+    27 00000020 4889E5                  	mov		rbp, rsp
+    28                                  
+    29 00000023 F20F100425-             		movsd	xmm0, [radius]
+    29 00000028 [00000000]         
+    30 0000002C F20F590425-             		mulsd	xmm0, [radius]
+    30 00000031 [00000000]         
+    31 00000035 F20F590425-             		mulsd	xmm0, [pi]
+    31 0000003A [08000000]         
+    32                                  	
+    33 0000003E C9                      	leave
+    34 0000003F C3                      	ret

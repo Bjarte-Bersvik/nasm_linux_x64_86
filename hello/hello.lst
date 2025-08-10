@@ -1,0 +1,96 @@
+     1                                  ; hello.asm
+     2                                  section .data
+     3 00000000 48656C6C6F00            	msg			db	"Hello", 0
+     4                                  	len 		equ $ - msg -2
+     5                                  
+     6 00000006 577973746170696C20-     	msg_error 	db	"Wystapil blad podczas otwarcia pliku", 0xa, 0	
+     6 0000000F 626C616420706F6463-
+     6 00000018 7A6173206F74776172-
+     6 00000021 63696120706C696B75-
+     6 0000002A 0A00               
+     7                                  	len_error	equ $ - msg_error
+     8                                  
+     9 0000002C 662E74787400            	filename db "f.txt", 0
+    10                                  
+    11 00000032 0A                      	NL			db	0xa ; kod ascii nowego wiersza
+    12                                  
+    13                                  	O_RDONLY equ 0x0
+    14                                  	O_WRONLY equ 0x1
+    15                                  	O_RDWR   equ 0x2
+    16                                  	O_CREAT  equ 0x40
+    17                                  
+    18                                  	MODE	equ 0777
+    19                                  	
+    20                                  section .bss
+    21 00000000 ????????????????        	file_descriptor resq 1 ; 8 bajtów na file descriptor
+    22 00000008 <res 400h>              	read_buffer resb 1024 ; 1024 bajty max bufor na odczyt
+    23                                  	
+    24                                  section .text
+    25                                  global main
+    26                                  
+    27                                  main:
+    28 00000000 B801000000              	mov rax, 1 ; 1 = wypisz
+    29 00000005 BF01000000              	mov rdi, 1 ; na stdout
+    30 0000000A 48BE-                   	mov rsi, msg ; lancuch do wyswietlania w rsi
+    30 0000000C [0000000000000000] 
+    31 00000014 BA04000000              	mov rdx, len ;
+    32 00000019 0F05                    	syscall
+    33                                  
+    34 0000001B B801000000              	mov	rax, 1
+    35 00000020 BF01000000              	mov rdi, 1
+    36 00000025 48BE-                   	mov rsi, NL
+    36 00000027 [3200000000000000] 
+    37 0000002F BA01000000              	mov rdx, 1
+    38 00000034 0F05                    	syscall
+    39                                  
+    40 00000036 B802000000              	mov rax, 2 ; open
+    41 0000003B 48BF-                   	mov rdi, filename
+    41 0000003D [2C00000000000000] 
+    42 00000045 BE00000000              	mov rsi, O_RDONLY
+    43 0000004A BA09030000              	mov rdx, MODE
+    44 0000004F 0F05                    	syscall
+    45                                  
+    46 00000051 4883F800                	cmp rax, 0
+    47 00000055 7C5D                    	jl 	exit_error_open_file
+    48                                  
+    49 00000057 48890425[00000000]      	mov [file_descriptor], rax
+    50                                  
+    51 0000005F B800000000              	mov rax, 0 ; read file content
+    52 00000064 488B3C25[00000000]      	mov rdi, [file_descriptor]
+    53 0000006C 48BE-                   	mov rsi, read_buffer
+    53 0000006E [0800000000000000] 
+    54 00000076 BA00040000              	mov rdx, 1024
+    55 0000007B 0F05                    	syscall
+    56                                  
+    57 0000007D 4989C0                  	mov r8, rax ; liczba bajtów wczytanych do bufora (jest w rax)
+    58                                  
+    59 00000080 B801000000              	mov rax, 1
+    60 00000085 BF01000000              	mov rdi, 1
+    61 0000008A 48BE-                   	mov rsi, read_buffer
+    61 0000008C [0800000000000000] 
+    62 00000094 4C89C2                  	mov rdx, r8
+    63 00000097 0F05                    	syscall
+    64                                  
+    65 00000099 B803000000              	mov rax, 3
+    66 0000009E 488B3C25[00000000]      	mov rdi, [file_descriptor]
+    67 000000A6 0F05                    	syscall
+    68                                  	
+    69 000000A8 B83C000000              	mov	rax, 60 ; wyjscie
+    70 000000AD BF00000000              	mov	rdi, 0 ; sygnal sukces
+    71 000000B2 0F05                    	syscall
+    72                                  
+    73                                  exit_error_open_file:
+    74 000000B4 B801000000              	mov rax, 1
+    75 000000B9 BF01000000              	mov rdi, 1
+    76 000000BE 48BE-                   	mov rsi, msg_error
+    76 000000C0 [0600000000000000] 
+    77 000000C8 BA26000000              	mov rdx, len_error
+    78 000000CD 0F05                    	syscall
+    79                                  
+    80 000000CF B803000000              	mov rax, 3
+    81 000000D4 488B3C25[00000000]      	mov rdi, [file_descriptor]
+    82 000000DC 0F05                    	syscall
+    83                                  		
+    84 000000DE B83C000000              	mov	rax, 60 ; wyjscie
+    85 000000E3 BF01000000              	mov	rdi, 1 ; error
+    86 000000E8 0F05                    	syscall

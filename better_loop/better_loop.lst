@@ -1,0 +1,32 @@
+     1                                  extern printf
+     2                                  section .data
+     3 00000000 0500000000000000        	number	dq	5
+     4 00000008 53756D61206F642030-     	fmt		db	"Suma od 0 do %ld to %ld", 10, 0
+     4 00000011 20646F20256C642074-
+     4 0000001A 6F20256C640A00     
+     5                                  
+     6                                  section .bss
+     7                                  section .text
+     8                                  	global main
+     9                                  
+    10                                  main:
+    11 00000000 55                      	push	rbp
+    12 00000001 4889E5                  	mov		rbp, rsp
+    13                                  
+    14 00000004 488B0C25[00000000]      	mov		rcx, [number]
+    15 0000000C B800000000              	mov		rax, 0
+    16                                  
+    17                                  bloop:
+    18 00000011 4801C8                  	add		rax, rcx
+    19 00000014 E2FB                    	loop	bloop		; loop zminejsza RCX o 1
+    20                                  
+    21 00000016 48BF-                   	mov		rdi, fmt
+    21 00000018 [0800000000000000] 
+    22 00000020 488B3425[00000000]      	mov		rsi, [number]
+    23 00000028 4889C2                  	mov		rdx, rax
+    24 0000002B B800000000              	mov		rax, 0
+    25 00000030 E8(00000000)            	call	printf
+    26                                  	
+    27 00000035 4889EC                  	mov		rsp, rbp
+    28 00000038 5D                      	pop		rbp
+    29 00000039 C3                      	ret
